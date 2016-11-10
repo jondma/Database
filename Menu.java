@@ -21,72 +21,89 @@ class Menu
 	{
 		do
 		{	
-			System.out.println("Welcome to the hotel database.");
-			System.out.println("1) Find a hotel room");
-			System.out.println("2) Book a hotel room");
-			System.out.println("3) Find a booking");
-			System.out.println("4) Cancel a booking");
-			System.out.println("5) List all guests");
-			System.out.println("6) Add a hotel");
-			System.out.println("7) Quit");
-			System.out.println("-------------------------------------\n");
-			System.out.println("Enter an option:");
+			System.out.println("-------------------------------------\n" +
+					  "    Welcome to the hotel database.\n" +
+					  "-------------------------------------\n" +
+					  "1) Find a hotel room\n" +
+					  "2) Book a hotel room\n" +
+					  "3) Find a booking\n" +
+					  "4) Cancel a booking\n" +
+					  "5) List all guests\n" +
+					  "6) Add a hotel\n" +
+					  "7) Quit\n" +
+					  "-------------------------------------\n" +
+					  "Enter an option:");
 
 			choice = sc.nextInt();
 
 			switch (choice)
 			{
 				case 1:
-					System.out.println("Finding a hotel room.");
+					System.out.println("-------------------------------------\n" +
+					"        Finding a hotel room.\n" +
+					"-------------------------------------\n"); 
 					this.findHotel();
 					break;
 				case 2:
-					System.out.println("Booking a hotel room.");
+					System.out.println("-------------------------------------\n" +
+					"        Booking a hotel room.\n" +
+					"-------------------------------------\n"); 
 					this.bookHotel();
 					break;
 				case 3:
-					System.out.println("Finding a booking.");
+					System.out.println("-------------------------------------\n" +
+					"         Finding a booking.\n" +
+					"-------------------------------------\n"); 
+					this.findBooking();
 					break;
 				case 4:
-					System.out.println("Canceling a booking.");
+					System.out.println("-------------------------------------\n" +
+					"        Canceling a booking.\n" +
+					"-------------------------------------\n"); 
+					this.cancelBooking();
 					break;
 				case 5:
-					System.out.println("Listing all guests.");
+					System.out.println("-------------------------------------\n" +
+					"         Listing all guests.\n" +
+					"-------------------------------------\n"); 
+					this.listGuests();
 					break;
 				case 6:
-					System.out.println("Adding a hotel.");
+					System.out.println("-------------------------------------\n" +
+					"          Adding a hotel.\n" +
+					"-------------------------------------\n"); 
+					this.addHotel();
 					break;
 				case 7:
-					System.out.println("Exiting now. Goodbye.");
+					System.out.println("-------------------------------------\n" +
+					"        Exiting now. Goodbye.\n" +
+					"-------------------------------------"); 
 					break;
 				default:
-					System.out.println("\n----------------------------------");
-					System.out.println("Invalid option.");
-					System.out.println("\n----------------------------------");
+					System.out.println("-----------------------------------");
+					System.out.println("          Invalid option");
+					System.out.println("-----------------------------------");
 					break;
 			}
 		}
 		while(choice != 7);
 	}
 
+	// Search for available rooms at all hotel for duration of user's stay
 	public void findHotel()
 	{
-		String query	 = "";
-		String checkin	 = "";
-		String checkout  = "";
-
 		// Prompt user for date of checkin
 		System.out.println("Checkin Date:");
-		checkin = getDate();
+		String checkin = getDate();
 		System.out.println("checkin:" + checkin);
 
 		// Prompt user for date of checkout
 		System.out.println("Checkout Date:");
-		checkout = getDate();
+		String checkout = getDate();
 		System.out.println("checkout:" + checkout);
 		
 		// MySQL query that displays hotels available
-		query = "SELECT hotelName, type, Room.roomNo, price " +
+		String query1 = "SELECT hotelName, type, Room.roomNo, price " +
 			"FROM Hotel, Room, Booking " +
 		 	"WHERE hotelID = Room.hotelNo " +
 			"AND Room.roomNo = Booking.roomNo " +
@@ -100,9 +117,9 @@ class Menu
 			"AND Room.hotelNo = Booking.hotelNo " +
 			"WHERE hotelID = Room.hotelNo " +
 			"AND bookingNo IS NULL;";
-		System.out.println(query);
+		System.out.println(query1);
 
-		test.query(query);
+		test.query(query1);
 	}
 
 	// Prompts user for date and returns date as string in 'yyyy-mm-dd' format
@@ -176,9 +193,11 @@ class Menu
 		return date;
 	}
 
-	// book Hotel
+	// Search if user has previously booked a hotel room before
+	// Books a hotel room for user
 	public void bookHotel()
 	{
+		// Prompt user for name
 		System.out.println("Enter your name:");
 		sc.nextLine();
 		String name = sc.nextLine();
@@ -197,20 +216,34 @@ class Menu
 			String address = sc.nextLine();
 			System.out.println("address:" + address + ":");
 			
+			// Search for unique guestNo
+			int j = -1;
+			do
+			{
+				j++;
+				// MySQL query that displays existing bookingNo 
+				String query2 = "SELECT guestNo FROM Guest WHERE guestNo = " + j + ";";
+
+				System.out.println(query2);
+				test.query(query2);
+				//++i;
+			}
+			while(!test.empty);
+
 			// Insert new guest record
-			String query2 = "'" + name + "', '" + address + "'";
+			String query3 = j + ", '" + name + "', '" + address + "'";
 			System.out.println("\n----------------------------------------------n");
-			System.out.println("query2:" + query2);
+			System.out.println("query3:" + query3);
 			System.out.println("\n----------------------------------------------n");
-			test.insert("Guest(guestName, guestAddress)", query2);
+			test.insert("Guest", query3);
 			
 			// Displays guestNo of new gues
 			System.out.println("\n----------------------------------------------n");
-			String query3 = "SELECT guestNo FROM Guest WHERE guestName = '" +
+			String query4 = "SELECT guestNo FROM Guest WHERE guestName = '" +
 					name + "' AND guestAddress = '" + address + "';";
-			System.out.println("query3:" + query3);
+			System.out.println("query4:" + query4);
 			System.out.println("\n----------------------------------------------n");
-			test.query(query3);
+			test.query(query4);
 
 			// Prompt user for Booking info
 			System.out.println("Enter Guest Number:");
@@ -224,30 +257,27 @@ class Menu
 			String checkout = getDate();
 		
 			// Search for hotelID from hotelName
-			String query4 = "SELECT hotelID FROM Hotel WHERE hotelName = '" + 
+			String query5 = "SELECT hotelID FROM Hotel WHERE hotelName = '" + 
 					hotel + "';";
 			System.out.println("\n----------------------------------------------n");
-			System.out.println("query4:" + query4);
+			System.out.println("query5:" + query5);
 			System.out.println("\n----------------------------------------------n");
-			test.query(query4);
+			test.query(query5);
 
 			// Prompt user for hotelNo
 			System.out.println("Enter hotelID:");
 			int hotelID = sc.nextInt();
 			
-
-///////////////////////////////////////////ERROR//////////////////////////////////////////////////////
-
 			// Search for unique bookingNo
 			int i = -1;
 			do
 			{
 				i++;
 				// MySQL query that displays existing bookingNo 
-				String query5 = "SELECT bookingNo FROM Booking WHERE bookingNo = " + i + ";";
+				String query6 = "SELECT bookingNo FROM Booking WHERE bookingNo = " + i + ";";
 
-				System.out.println(query5);
-				test.query(query5);
+				System.out.println(query6);
+				test.query(query6);
 				//++i;
 			}
 			while(!test.empty);
@@ -260,22 +290,115 @@ class Menu
 			System.out.println(query6);
 			test.insert("Booking", query6);
 		}
-
-///////////////////////////////////////////ERROR//////////////////////////////////////////////////////
-		//int i = 0;
-		
-		//do
-		//{
-		//	test.query(query1);
-		
-		//	if(test.empty)
-		//	{
-		//		i++;
-		//	}
-		//}
-		//while(test.query(query1).resultSet.next());
 	}
 
+	// Search for booking details of user
+	void findBooking()
+	{
+		// Prompt user for name
+		System.out.println("Enter name:");
+		sc.nextLine();
+		String name = sc.nextLine();
+		System.out.println("name:" + name);
 
+		// MySQL query that displays guest information based on guestName
+		String query1 = "SELECT guestNo, guestAddress " +
+				"FROM Guest " +
+				"WHERE guestName = '" + name + "'";
+		test.query(query1);
+		
+		// Name not found
+		if(test.empty)
+		{
+			System.out.println("Name not found. Going back to main menu.");
+			return;
+		}
+
+		// Prompt user for guest number
+		System.out.println("Enter guest number:");
+		int guestNum = sc.nextInt();
+		System.out.println("guest " + guestNum);
+
+		// MySQL query that display booking information
+		// for existing booking of user
+		String query2 = "SELECT bookingNo, hotelName, dateFrom AS checkin, type " +
+				"FROM Hotel, Room, Booking " +
+				"WHERE hotelID = Booking.hotelNo " +
+				"AND Booking.roomNo = Room.roomNo " +
+				"AND Booking.hotelNo = Room.hotelNo " +
+				"AND guestNo = " + guestNum + ";";
+		System.out.println("query2:" + query2);
+		test.query(query2);
+	}
+
+	// Cancel a booking
+	void cancelBooking()
+	{
+		// Prompt user for booking number
+		System.out.println("Enter booking number:");
+		int bookingNum = sc.nextInt();
+		System.out.println("Booking " + bookingNum);
+
+		// MySQL query that delete booking record
+		String query1 = "bookingNo = " + bookingNum;
+		System.out.println("query1:" + query1);
+		test.remove("Booking", query1);
+	}
+
+	// List all guests at a hotel on a specified date
+	void listGuests()
+	{
+		// MySQL query that displays name and ID for all hotels
+		String query1 = "SELECT hotelName, hotelID " +
+				"FROM Hotel;";
+		System.out.println("query1:" + query1);
+		test.query(query1);
+
+		// Prompt user for hotelID and date
+		System.out.println("Enter hotelID:");
+		int id = sc.nextInt();
+		String date = getDate();
+		
+		// MySQL query that displays names of all guests staying
+		// at a specific hotel on a specific date
+		String query2 = "SELECT DISTINCT guestName " +
+				"FROM Hotel, Guest, Booking " +
+				"WHERE Guest.guestNo = Booking.guestNo " +
+				"AND hotelNo = " + id + " " +
+				"AND " + date + " BETWEEN dateFrom AND dateTo;";
+		System.out.print("query2:" + query2);
+		test.query(query2);
+	}
+
+	// Add a new hotel until user quits
+	void addHotel()
+	{
+		// Prompt user for new hotel name
+		System.out.println("Enter new hotel name:");
+		sc.nextLine();
+		String name = sc.nextLine();
+		System.out.println("Hotel " + name);
+
+		// Prompt user for new hotel city
+		System.out.println("Enter new hotel city:");
+		String city = sc.nextLine();
+		System.out.println("city:" + city);
+		
+		// Search for unique hotelID
+		int i = -1;
+		do
+		{
+			i++;
+			// MySQL query that displays existing hotelID 
+			String query1 = "SELECT hotelID FROM Hotel WHERE hotelID = " + i + ";";
+			System.out.println("query1:" + query1);
+			test.query(query1);
+		}
+		while(!test.empty);
+
+		// Insert new hotel into table Hotel
+		String query2 = i + ", '" + name + "', '" + city + "'";
+		System.out.println("query2:" + query2);
+		test.insert("Hotel", query2);
+	} 
 }
-
