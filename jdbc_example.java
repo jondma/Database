@@ -123,6 +123,20 @@ public class jdbc_example {
         }
     }
 
+    // Remove a record from a table
+    public void remove(String table, String values)
+    {
+        String query = "DELETE FROM " + table + " WHERE " + values + ";";
+	try
+	{
+	    statement.executeUpdate(query);
+	}
+	catch (SQLException e)
+	{
+	    e.printStackTrace();
+	}
+    }
+
     // Remove all records and fill them with values for testing
     // Assumes that the tables are already created
     public void initDatabase(String Username, String Password, String SchemaName) throws SQLException {
