@@ -6,7 +6,7 @@ public class jdbc_example {
     private Connection connection;
     private Statement statement;
 
-   // boolean empty = false;
+    boolean empty = true;	// boolean to tell Menu if query result is empty
 
     // The constructor for the class
     public jdbc_example() {
@@ -16,25 +16,22 @@ public class jdbc_example {
 
     // The main program that tests the methods
     public static void main(String[] args) throws SQLException {
-
-	//Menu m = new Menu();
-
         String Username = "";              // Change to your own username
         String mysqlPassword = "";    // Change to your own mysql Password
 
         //jdbc_example test = new jdbc_example();
-		Menu m = new Menu();
+	Menu m = new Menu();
         m.test.connect(Username, mysqlPassword);
         m.test.initDatabase(Username, mysqlPassword, Username);
 
 	m.menu();
 
-        String query1 = "SELECT guestNo from Guest WHERE guestNo = 3";
-        String query2 = "SELECT hotelName, COUNT(Room.hotelNo) AS TOTALNUMBEROFROOM, " +
-                "AVG (Room.price) AS AVGPRICEPERROOM " +
-                "FROM Room, Hotel " +
-                "WHERE Room.hotelNo=Hotel.hotelID " +
-                "GROUP BY hotelNo";
+        //String query1 = "SELECT guestNo from Guest WHERE guestNo = 3";
+        //String query2 = "SELECT hotelName, COUNT(Room.hotelNo) AS TOTALNUMBEROFROOM, " +
+        //        "AVG (Room.price) AS AVGPRICEPERROOM " +
+        //        "FROM Room, Hotel " +
+        //        "WHERE Room.hotelNo=Hotel.hotelID " +
+        //        "GROUP BY hotelNo";
 
         //m.test.query(query1);
         //test.query(query2);
@@ -68,8 +65,6 @@ public class jdbc_example {
             ResultSet resultSet = statement.executeQuery(q);
             System.out.println("\n---------------------------------");
             System.out.println("Query: \n" + q + "\n\nResult: ");
-//		if(resultSet.next())
-//			empty = true;
             print(resultSet);
         }
         catch (SQLException e) {
@@ -100,15 +95,18 @@ public class jdbc_example {
     // Print the attribute values for all tuples in the result
     public void printRecords(ResultSet resultSet, int numColumns) throws SQLException {
         String columnValue;
-//		columnValue = resultSet.getString(1);
-//		System.out.print("\n\ncol:" + columnValue + ":\n\n");
-//		System.out.print("\n\ncol:" + numColumns + ":\n\n");
+	if(resultSet.next())
+	{
+		resultSet.previous();
+		empty = false;
+	}
+	else
+		empty = true;
         while (resultSet.next()) {
             for (int i = 1; i <= numColumns; i++) {
                 if (i > 1)
                     System.out.print(",  ");
                 columnValue = resultSet.getString(i);
-			//System.out.print("\n\ncolVal:" + columnValue + ":\n\n");
                 System.out.print(columnValue);
             }
             System.out.println("");
