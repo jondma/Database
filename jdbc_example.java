@@ -1,6 +1,7 @@
 import java.sql.*;
 
-public class jdbc_example {
+public class jdbc_example 
+{
 
     // The instance variables for the class
     private Connection connection;
@@ -9,33 +10,28 @@ public class jdbc_example {
     boolean empty = true;	// boolean to tell Menu if query result is empty
 
     // The constructor for the class
-    public jdbc_example() {
+    public jdbc_example() 
+    {
         connection = null;
         statement = null;
     }
 
     // The main program that tests the methods
-    public static void main(String[] args) throws SQLException {
-        String Username = "";              // Change to your own username
+    public static void main(String[] args) throws SQLException 
+    {
+        String Username = "";             // Change to your own username
         String mysqlPassword = "";    // Change to your own mysql Password
 
-        //jdbc_example test = new jdbc_example();
 	Menu m = new Menu();
+
+	// Connect to Database and initialize
         m.test.connect(Username, mysqlPassword);
         m.test.initDatabase(Username, mysqlPassword, Username);
 
+	// Start main menu
 	m.menu();
 
-        //String query1 = "SELECT guestNo from Guest WHERE guestNo = 3";
-        //String query2 = "SELECT hotelName, COUNT(Room.hotelNo) AS TOTALNUMBEROFROOM, " +
-        //        "AVG (Room.price) AS AVGPRICEPERROOM " +
-        //        "FROM Room, Hotel " +
-        //        "WHERE Room.hotelNo=Hotel.hotelID " +
-        //        "GROUP BY hotelNo";
-
-        //m.test.query(query1);
-        //test.query(query2);
-
+	// Disconnect from Database
         m.test.disConnect();
     }
 
@@ -95,6 +91,8 @@ public class jdbc_example {
     // Print the attribute values for all tuples in the result
     public void printRecords(ResultSet resultSet, int numColumns) throws SQLException {
         String columnValue;
+	
+	// Check if result is empty
 	if(resultSet.next())
 	{
 		resultSet.previous();
@@ -121,6 +119,20 @@ public class jdbc_example {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    // Remove a record from a table
+    public void remove(String table, String values)
+    {
+        String query = "DELETE FROM " + table + " WHERE " + values + ";";
+	try
+	{
+	    statement.executeUpdate(query);
+	}
+	catch (SQLException e)
+	{
+	    e.printStackTrace();
+	}
     }
 
     // Remove all records and fill them with values for testing
